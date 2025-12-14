@@ -66,15 +66,15 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
   return (
     <div className="space-y-4">
       {preview ? (
-        <div className="relative rounded-none sm:rounded-xl overflow-hidden bg-gray-100 aspect-square sm:aspect-video w-full group">
+        <div className="relative rounded-none sm:rounded-xl overflow-hidden bg-black/5 aspect-square sm:aspect-video w-full group flex items-center justify-center">
           <img
             src={preview}
             alt="预览"
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
           />
           <button
             onClick={handleRemove}
-            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
+            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full backdrop-blur-md z-10"
           >
             <X className="w-5 h-5" />
           </button>

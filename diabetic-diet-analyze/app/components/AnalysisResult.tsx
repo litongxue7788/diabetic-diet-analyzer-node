@@ -63,184 +63,103 @@ export default function AnalysisResult({ result }: AnalysisResultProps) {
   }
 
   return (
-    <div className="space-y-8">
-      {/* 风险等级 Banner - 高对比度大字 */}
-      <div className={`p-6 rounded-2xl border-2 ${getRiskColor(result.risk_level)} shadow-sm`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            {getRiskIcon(result.risk_level)}
-            <div>
-              <h3 className="text-2xl font-bold">风险等级: {result.risk_level}</h3>
-              <p className="text-lg mt-1 font-medium opacity-90">
-                {result.risk_level === '低' && '✅ 血糖影响小，放心食用'}
-                {result.risk_level === '中' && '⚠️ 注意份量，适量食用'}
-                {result.risk_level === '高' && '🚫 碳水较高，建议少吃'}
-              </p>
-            </div>
-          </div>
-          <div className="text-5xl">
-            {result.risk_level === '低' && '🟢'}
-            {result.risk_level === '中' && '🟡'}
-            {result.risk_level === '高' && '🔴'}
-          </div>
-        </div>
+    <div className="space-y-6 pb-24">
+      {/* 1. 营养成分表 (Table) */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+         <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+           <span className="w-1 h-5 bg-[#769152] rounded-full"></span>
+           营养成分
+         </h3>
+         <div className="overflow-hidden rounded-xl border border-gray-200">
+           <table className="w-full text-sm text-center">
+             <thead className="bg-[#769152]/10 text-[#769152]">
+               <tr>
+                 <th className="py-3 font-bold">碳水</th>
+                 <th className="py-3 font-bold">蛋白质</th>
+                 <th className="py-3 font-bold">脂肪</th>
+                 <th className="py-3 font-bold">热量</th>
+               </tr>
+             </thead>
+             <tbody className="divide-y divide-gray-100">
+               <tr className="bg-white">
+                 <td className="py-3 font-bold text-gray-800">{result.nutrition.total_carbs}g</td>
+                 <td className="py-3 text-gray-600">--</td>
+                 <td className="py-3 text-gray-600">--</td>
+                 <td className="py-3 font-bold text-orange-600">{result.nutrition.calories}</td>
+               </tr>
+             </tbody>
+           </table>
+           <div className="grid grid-cols-2 divide-x divide-gray-100 border-t border-gray-100 bg-gray-50/50">
+             <div className="p-2 text-center">
+               <div className="text-xs text-gray-500">净碳水</div>
+               <div className="font-bold text-green-700">{result.nutrition.net_carbs}g</div>
+             </div>
+             <div className="p-2 text-center">
+               <div className="text-xs text-gray-500">升糖负荷 (GL)</div>
+               <div className="font-bold text-blue-700">{result.nutrition.gl_level}</div>
+             </div>
+           </div>
+         </div>
       </div>
 
-      {/* 标签页导航 - 大按钮 */}
-      <div className="bg-gray-100 p-1.5 rounded-xl flex gap-2">
-        {['overview', 'foods', 'advice'].map((tab) => (
-          <button
-            key={tab}
-            onClick={() => setActiveTab(tab as any)}
-            className={`flex-1 py-4 rounded-lg font-bold text-lg transition-all shadow-sm ${
-              activeTab === tab
-                ? 'bg-white text-green-700 shadow-md ring-1 ring-black/5'
-                : 'bg-transparent text-gray-500 hover:bg-gray-200 hover:text-gray-700'
-            }`}
-          >
-            {tab === 'overview' && '📊 营养概览'}
-            {tab === 'foods' && '🥗 食物详情'}
-            {tab === 'advice' && '💡 专家建议'}
-          </button>
-        ))}
-      </div>
-
-      {/* 内容区域 */}
-      <div className="min-h-[300px]">
-        {activeTab === 'overview' && (
-          <div className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {/* 饼图 */}
-               <NutritionPieChart foods={result.foods} />
-               
-               {/* 核心指标卡片 */}
-               <div className="grid grid-cols-2 gap-4">
-                 <div className="bg-green-50 p-4 rounded-2xl border-2 border-green-100 flex flex-col items-center text-center shadow-sm justify-center">
-                   <div className="flex items-center gap-2 mb-1">
-                      <Apple className="w-6 h-6 text-green-600" />
-                      <h4 className="text-lg font-bold text-green-800">净碳水</h4>
-                   </div>
-                   <span className="text-3xl font-extrabold text-green-700 my-1">
-                     {result.nutrition.net_carbs}
-                   </span>
-                   <p className="text-sm text-green-700 font-medium">克 (g)</p>
+      {/* 2. 食物详情列表 */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+         <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+           <span className="w-1 h-5 bg-[#769152] rounded-full"></span>
+           食物详情
+         </h3>
+         <div className="space-y-3">
+           {result.foods.map((food, index) => (
+             <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-xl border border-gray-100">
+               <div className="flex items-center gap-3">
+                 <div className="w-8 h-8 rounded-full bg-[#769152]/10 flex items-center justify-center text-[#769152] font-bold text-sm shrink-0">
+                   {index + 1}
                  </div>
-
-                 <div className="bg-blue-50 p-4 rounded-2xl border-2 border-blue-100 flex flex-col items-center text-center shadow-sm justify-center">
-                   <div className="flex items-center gap-2 mb-1">
-                      <Activity className="w-6 h-6 text-blue-600" />
-                      <h4 className="text-lg font-bold text-blue-800">升糖负荷</h4>
-                   </div>
-                   <span className="text-3xl font-extrabold text-blue-700 my-1">
-                     {result.nutrition.gl_level}
-                   </span>
-                   <p className="text-sm text-blue-700 font-medium">GL 值</p>
-                 </div>
-
-                 <div className="bg-yellow-50 p-4 rounded-2xl border-2 border-yellow-100 flex flex-col items-center text-center shadow-sm justify-center">
-                   <div className="flex items-center gap-2 mb-1">
-                      <Scale className="w-6 h-6 text-yellow-600" />
-                      <h4 className="text-lg font-bold text-yellow-800">膳食纤维</h4>
-                   </div>
-                   <span className="text-3xl font-bold text-yellow-700 my-1">
-                     {result.nutrition.fiber}
-                   </span>
-                   <p className="text-sm text-yellow-700 font-medium">克 (g)</p>
-                 </div>
-
-                 <div className="bg-orange-50 p-4 rounded-2xl border-2 border-orange-100 flex flex-col items-center text-center shadow-sm justify-center">
-                    <div className="flex items-center gap-2 mb-1">
-                      <Flame className="w-6 h-6 text-orange-600" />
-                      <h4 className="text-lg font-bold text-orange-800">总热量</h4>
-                    </div>
-                   <span className="text-3xl font-bold text-orange-700 my-1">
-                     {result.nutrition.calories}
-                   </span>
-                   <p className="text-sm text-orange-700 font-medium">千卡</p>
+                 <div>
+                   <div className="font-bold text-gray-800">{food.name}</div>
+                   <div className="text-xs text-gray-500">约 {food.estimated_weight}</div>
                  </div>
                </div>
-            </div>
-          </div>
-        )}
+               <div className="text-right">
+                  <div className="text-xs text-gray-400">碳水</div>
+                  <div className="font-bold text-gray-700">{food.nutrients?.carbs || '-'}g</div>
+               </div>
+             </div>
+           ))}
+         </div>
+      </div>
 
-        {activeTab === 'foods' && (
-          <div className="space-y-4">
-            <h4 className="text-xl font-bold text-gray-800 mb-4 px-2">识别到的食物清单:</h4>
-            {result.foods.map((food, index) => (
-              <div
-                key={index}
-                className="flex flex-col sm:flex-row sm:items-center justify-between p-5 bg-white border-2 border-gray-100 rounded-2xl shadow-sm hover:border-green-200 transition-colors"
-              >
-                <div className="flex items-start gap-4 mb-3 sm:mb-0">
-                  <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center shrink-0">
-                    <span className="text-xl font-bold text-green-700">{index + 1}</span>
-                  </div>
-                  <div>
-                    <h5 className="text-xl font-bold text-gray-900">{food.name}</h5>
-                    <p className="text-lg text-gray-600 mt-1">
-                      约 <span className="font-bold text-gray-900">{food.estimated_weight}</span>
-                    </p>
-                  </div>
-                </div>
-                <div className="flex gap-6 pl-16 sm:pl-0">
-                  <div className="text-left sm:text-right">
-                    <p className="text-base text-gray-500">碳水</p>
-                    <p className="text-xl font-bold text-gray-900">{food.nutrients?.carbs || '--'}g</p>
-                  </div>
-                  <div className="text-left sm:text-right">
-                    <p className="text-base text-gray-500">蛋白质</p>
-                    <p className="text-xl font-bold text-gray-900">{food.nutrients?.protein || '--'}g</p>
-                  </div>
-                </div>
+      {/* 3. 专家建议 */}
+      <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+         <h3 className="text-lg font-bold text-gray-800 mb-3 flex items-center gap-2">
+           <span className="w-1 h-5 bg-[#769152] rounded-full"></span>
+           专家建议
+         </h3>
+         <div className="space-y-3">
+           {result.recommendations.map((advice, index) => (
+              <div key={index} className="flex gap-3 text-sm text-gray-700 leading-relaxed p-2 hover:bg-green-50 rounded-lg transition-colors">
+                 <CheckCircle2 className="w-5 h-5 text-[#769152] shrink-0 mt-0.5" />
+                 <span>{advice}</span>
               </div>
-            ))}
-          </div>
-        )}
-
-        {activeTab === 'advice' && (
-          <div className="space-y-6">
-            <div className="space-y-4">
-              <h4 className="text-xl font-bold text-gray-800 flex items-center gap-2 px-2">
-                <Heart className="w-6 h-6 text-red-500 fill-current" />
-                营养师建议
-              </h4>
-              <div className="space-y-4">
-                {result.recommendations.map((advice, index) => (
-                  <div
-                    key={index}
-                    className="p-5 bg-green-50 rounded-2xl border border-green-200 flex gap-4"
-                  >
-                    <ChevronRight className="w-6 h-6 text-green-600 shrink-0 mt-0.5" />
-                    <p className="text-lg text-gray-800 leading-relaxed font-medium">
-                      {advice}
-                    </p>
-                  </div>
-                ))}
-              </div>
+           ))}
+         </div>
+         {/* 风险提示 Banner */}
+         <div className={`mt-4 p-3 rounded-xl border ${getRiskColor(result.risk_level)} flex items-center justify-between`}>
+            <div className="flex items-center gap-2">
+               {getRiskIcon(result.risk_level)}
+               <span className="font-bold">综合风险等级: {result.risk_level}</span>
             </div>
+            <span className="text-2xl">
+               {result.risk_level === '低' && '🟢'}
+               {result.risk_level === '中' && '🟡'}
+               {result.risk_level === '高' && '🔴'}
+            </span>
+         </div>
+      </div>
 
-            <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100">
-              <div className="flex items-start gap-4">
-                <Clock className="w-8 h-8 text-blue-600 shrink-0" />
-                <div>
-                  <h5 className="text-xl font-bold text-gray-900">运动建议</h5>
-                  <p className="text-lg text-gray-700 mt-2 leading-relaxed">
-                    建议在餐后 <span className="font-bold text-blue-700">30分钟</span> 后，
-                    进行 <span className="font-bold text-blue-700">15-20分钟</span> 的轻松散步。
-                    这能显著帮助肌肉吸收血糖，平稳餐后峰值。
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* 免责声明 */}
-        <div className="mt-8 p-4 bg-gray-50 rounded-xl border border-gray-100">
-          <p className="text-base text-gray-500 text-center leading-relaxed">
-            📢 {result.disclaimer}
-          </p>
-        </div>
+      {/* 4. 底部声明 */}
+      <div className="text-center text-xs text-gray-400 px-4">
+        <p>⚠️ {result.disclaimer}</p>
       </div>
     </div>
   )
