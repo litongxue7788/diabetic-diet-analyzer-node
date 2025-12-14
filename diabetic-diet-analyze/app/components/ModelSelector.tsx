@@ -69,11 +69,11 @@ export default function ModelSelector({ selectedModel, onModelSelect }: ModelSel
               key={model.id}
               onClick={() => onModelSelect(model.id)}
               disabled={disabled}
-              className={`w-16 h-16 rounded-full border-2 transition-all shadow-md flex items-center justify-center text-center ${
-                active ? 'bg-[#769152] text-white border-[#6F8D45] shadow-lg' : 'bg-white text-gray-700 border-gray-200'
+              className={`w-20 h-20 rounded-full border-2 transition-all shadow-md flex items-center justify-center text-center ${
+                active ? 'bg-gradient-to-b from-[#8AA563] to-[#769152] text-white border-[#6F8D45] shadow-lg' : 'bg-white text-gray-700 border-gray-200'
               } ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
             >
-              <span className="text-[11px] font-bold leading-tight px-2">
+              <span className="text-[12px] font-bold leading-tight px-2">
                 {model.name}
               </span>
             </button>

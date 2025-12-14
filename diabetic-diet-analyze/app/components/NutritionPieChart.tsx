@@ -100,6 +100,14 @@ export default function NutritionPieChart({ foods, simple }: NutritionPieChartPr
       <div className="flex justify-center">
         <ResponsiveContainer width={300} height={220}>
           <PieChart>
+            <defs>
+              {data.map((d, i) => (
+                <linearGradient id={`grad-${i}`} key={i} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={shade(d.color, 0.3)} />
+                  <stop offset="100%" stopColor={d.color} />
+                </linearGradient>
+              ))}
+            </defs>
             <Pie
               data={data}
               cx="50%"
@@ -110,7 +118,7 @@ export default function NutritionPieChart({ foods, simple }: NutritionPieChartPr
               dataKey="value"
             >
               {data.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} stroke={shade(entry.color, -0.2)} strokeWidth={3} />
+                <Cell key={`cell-${index}`} fill={`url(#grad-${index})`} stroke={shade(entry.color, -0.2)} strokeWidth={3} />
               ))}
             </Pie>
             <Tooltip 
