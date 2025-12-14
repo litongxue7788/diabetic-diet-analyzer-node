@@ -138,6 +138,12 @@ export default function Home() {
         <header className="bg-[#769152] text-white p-4 text-center font-bold text-lg sticky top-0 z-30 shadow-md flex justify-between items-center">
           <span>糖尿病膳食分析</span>
           <div className="flex items-center gap-3">
+            {loading && (
+              <div className="flex items-center gap-2 text-xs bg-white/15 px-2 py-1 rounded-full">
+                <div className="animate-spin rounded-full h-3 w-3 border-2 border-white/50 border-t-white"></div>
+                <span>正在分析...</span>
+              </div>
+            )}
             {loggedIn ? (
               <div className="flex items-center gap-1 text-xs bg-white/10 px-2 py-1 rounded-full cursor-pointer hover:bg-white/20" onClick={() => setShowSettings(true)}>
                 <User className="w-4 h-4" />
@@ -276,6 +282,11 @@ export default function Home() {
                  {file ? '开始分析' : '选择模型'}
                </button>
              </div>
+             {error && (
+               <div className="mt-2 text-xs text-red-700 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                 {error}
+               </div>
+             )}
            </div>
 
            {/* Middle: 2-Column Charts Grid */}
