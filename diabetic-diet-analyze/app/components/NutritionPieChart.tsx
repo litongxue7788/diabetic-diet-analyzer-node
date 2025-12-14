@@ -62,7 +62,15 @@ export default function NutritionPieChart({ foods, simple }: NutritionPieChartPr
   if (simple) {
     return (
       <div className="flex flex-col items-center w-full h-full">
-        <PieChart width={120} height={90}>
+        <PieChart width={120} height={90} style={{ filter: 'drop-shadow(0 6px 12px rgba(0,0,0,0.08))' }}>
+          <defs>
+            {data.map((d, i) => (
+              <radialGradient id={`rad-${i}`} key={i} cx="50%" cy="50%" r="60%">
+                <stop offset="0%" stopColor={shade(d.color, 0.3)} />
+                <stop offset="100%" stopColor={d.color} />
+              </radialGradient>
+            ))}
+          </defs>
           <Pie
             data={data}
             cx="50%"
@@ -73,7 +81,7 @@ export default function NutritionPieChart({ foods, simple }: NutritionPieChartPr
             dataKey="value"
           >
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} stroke={shade(entry.color, -0.2)} strokeWidth={2} />
+              <Cell key={`cell-${index}`} fill={`url(#rad-${index})`} stroke={shade(entry.color, -0.2)} strokeWidth={2} />
             ))}
           </Pie>
           <Tooltip 
@@ -99,7 +107,7 @@ export default function NutritionPieChart({ foods, simple }: NutritionPieChartPr
       <h4 className="text-lg font-bold text-gray-800 mb-2">三大营养素占比 (克)</h4>
       <div className="flex justify-center">
         <ResponsiveContainer width={300} height={220}>
-          <PieChart>
+          <PieChart style={{ filter: 'drop-shadow(0 8px 16px rgba(0,0,0,0.08))' }}>
             <defs>
               {data.map((d, i) => (
                 <linearGradient id={`grad-${i}`} key={i} x1="0" y1="0" x2="0" y2="1">

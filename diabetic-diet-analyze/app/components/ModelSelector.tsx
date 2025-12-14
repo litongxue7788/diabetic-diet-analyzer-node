@@ -21,6 +21,23 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
   const [models, setModels] = useState<Model[]>([])
   const [loading, setLoading] = useState(true)
 
+  const cnShort: Record<string, string> = {
+    'doubao-vision': '豆包',
+    'gemini-pro-vision': '双子',
+    'qwen-vl-plus': '通义',
+    'deepseek-vl': '深度求索',
+    'yi-vision': '零一',
+    'glm-4v': '智谱',
+  }
+  const cnFull: Record<string, string> = {
+    'doubao-vision': '豆包视觉',
+    'gemini-pro-vision': '双子视觉',
+    'qwen-vl-plus': '通义视觉',
+    'deepseek-vl': '深度求索(视觉)',
+    'yi-vision': '零一视觉',
+    'glm-4v': '智谱视觉',
+  }
+
   const defaultModels: Model[] = [
     { id: 'doubao-vision', name: 'Doubao Vision', description: '豆包视觉', provider: 'Doubao', status: 'available' },
     { id: 'gemini-pro-vision', name: 'Gemini Vision', description: 'Google视觉', provider: 'Google', status: 'available' },
@@ -76,13 +93,15 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
           selectedModel={selectedModel}
           onSelect={onModelSelect}
           size={size}
+          labelMap={cnShort}
+          centerLabelMap={cnFull}
         />
       </div>
 
       {selectedModel && (
         <div className="p-5 bg-green-50 rounded-xl border border-green-100">
           <p className="text-base text-gray-800 font-medium mb-1">
-             当前选择: {models.find(m => m.id === selectedModel)?.name}
+             当前选择: {cnFull[selectedModel] || models.find(m => m.id === selectedModel)?.name}
           </p>
           <p className="text-sm text-gray-600 leading-relaxed">
             {models.find(m => m.id === selectedModel)?.description}
@@ -98,11 +117,15 @@ function SegmentedCircle({
   selectedModel,
   onSelect,
   size,
+  labelMap,
+  centerLabelMap,
 }: {
   models: Model[]
   selectedModel: string
   onSelect: (id: string) => void
   size?: number
+  labelMap?: Record<string, string>
+  centerLabelMap?: Record<string, string>
 }) {
   const s = size || 220
   const cx = s / 2
@@ -152,14 +175,14 @@ function SegmentedCircle({
             </defs>
             <path d={pathFor(start, end)} fill={fill} stroke={active ? '#4B5E2D' : '#6F8D45'} strokeWidth={active ? 3 : 2} />
             <text x={tx} y={ty} fill={active ? '#ffffff' : '#1F2937'} fontSize="11" fontWeight="700" textAnchor="middle" dominantBaseline="middle">
-              {m.name}
+              {(labelMap && labelMap[m.id]) || m.name}
             </text>
           </g>
         )
       })}
       <circle cx={cx} cy={cy} r={rInner - 6} fill="#ffffff" stroke="#6F8D45" strokeWidth="2" />
       <text x={cx} y={cy} fill="#374151" fontSize="12" fontWeight="700" textAnchor="middle" dominantBaseline="middle">
-        {models.find(m => m.id === selectedModel)?.name || '选择模型'}
+        {(centerLabelMap && centerLabelMap[selectedModel]) || models.find(m => m.id === selectedModel)?.name || '选择模型'}
       </text>
     </svg>
   )

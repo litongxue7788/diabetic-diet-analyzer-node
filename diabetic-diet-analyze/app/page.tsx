@@ -88,7 +88,7 @@ export default function Home() {
   }, [file])
 
   return (
-    <main className="min-h-screen bg-white text-[#2C3E20] pb-24 font-sans">
+    <main className="min-h-screen bg-[#E9F3E2] text-[#2C3E20] pb-24 font-sans">
       <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative rounded-3xl border-4 border-[#6F8D45] overflow-hidden">
         
         {/* Header */}
@@ -100,7 +100,7 @@ export default function Home() {
         {/* Tab 1: Dashboard */}
         <div className={activeTab === 0 ? 'block' : 'hidden'}>
            {/* Top Section: Settings & Upload */}
-           <div className="grid grid-cols-12 gap-1 bg-white border-b-2 border-[#6F8D45]/60">
+           <div className="grid grid-cols-12 gap-3 border-b-2 border-[#6F8D45]/60">
             {/* Left: Model Settings */}
             <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col items-center justify-center bg-gray-50/50">
               <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} size={180} />
@@ -124,7 +124,7 @@ export default function Home() {
 
              {/* Right: Upload Area */}
              <div className="col-span-8 p-2">
-                <div className="relative h-48 sm:h-56 overflow-hidden">
+                <div className="relative h-48 sm:h-56 overflow-hidden bg-white rounded-2xl">
                   <ImageUploader onImageSelect={(f) => { setFile(f); setResult(null); }}>
                      {/* Analyze Button inside Upload Area */}
                      {file && !result && !loading && (
@@ -233,14 +233,14 @@ export default function Home() {
             </div>
          </div>
 
-        {/* Bottom Navigation: Capsule Buttons */}
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-72 h-14 bg-white rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border-2 border-[#6F8D45] p-1.5 flex items-center">
+        {/* Bottom Navigation: Capsule Buttons (integrated) */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-[320px] h-14 bg-[#769152]/90 rounded-full border border-[#6F8D45] p-1.5 flex items-center backdrop-blur-sm">
           <button
             onClick={() => setActiveTab(0)}
             className={`flex-1 rounded-full px-4 py-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 0
-                ? 'bg-[#769152] text-white shadow border border-[#6F8D45]'
-                : 'text-[#769152] hover:bg-[#769152]/10'
+                ? 'bg-white text-[#769152] shadow'
+                : 'text-white hover:bg-white/10'
             }`}
           >
             <Camera className="w-4 h-4" />
@@ -250,8 +250,8 @@ export default function Home() {
             onClick={() => setActiveTab(1)}
             className={`flex-1 rounded-full px-4 py-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 1
-                ? 'bg-[#769152] text-white shadow border border-[#6F8D45]'
-                : 'text-[#769152] hover:bg-[#769152]/10'
+                ? 'bg-white text-[#769152] shadow'
+                : 'text-white hover:bg-white/10'
             }`}
           >
             <FileText className="w-4 h-4" />
