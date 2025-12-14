@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react'
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, ReferenceLine } from 'recharts'
-import { TrendingUp, AlertCircle, Calendar } from 'lucide-react'
+import { TrendingUp } from 'lucide-react'
 
 interface HistoryRecord {
   timestamp: number
@@ -17,14 +17,11 @@ export default function DietHistoryChart() {
 
   useEffect(() => {
     setIsMounted(true)
-    // 从 localStorage 读取历史记录
     try {
       const stored = localStorage.getItem('diet_history')
       if (stored) {
         const parsed = JSON.parse(stored)
-        // 按时间排序
         parsed.sort((a: HistoryRecord, b: HistoryRecord) => a.timestamp - b.timestamp)
-        // 只取最近30条
         setHistory(parsed.slice(-30))
       }
     } catch (e) {
@@ -32,42 +29,46 @@ export default function DietHistoryChart() {
     }
   }, [])
 
+  // Listen for storage events (when new analysis is added)
+  useEffect(() => {
+    const handleStorage = () => {
+      try {
+        const stored = localStorage.getItem('diet_history')
+        if (stored) {
+           const parsed = JSON.parse(stored)
+           parsed.sort((a: HistoryRecord, b: HistoryRecord) => a.timestamp - b.timestamp)
+           setHistory(parsed.slice(-30))
+        }
+      } catch (e) {}
+    }
+    window.addEventListener('storage', handleStorage)
+    return () => window.removeEventListener('storage', handleStorage)
+  }, [])
+
   const analysis = useMemo(() => {
     if (history.length === 0) return null
-
     const totalCarbs = history.reduce((sum, item) => sum + item.net_carbs, 0)
     const avgCarbs = Math.round(totalCarbs / history.length)
     const highRiskCount = history.filter(h => h.risk_level === '高').length
     const trend = history.length >= 2 
       ? history[history.length - 1].net_carbs - history[history.length - 2].net_carbs 
       : 0
-
-    return {
-      avgCarbs,
-      highRiskCount,
-      trend: parseFloat(trend.toFixed(1)),
-      count: history.length
-    }
+    return { avgCarbs, highRiskCount, trend: parseFloat(trend.toFixed(1)), count: history.length }
   }, [history])
 
   if (!isMounted) return null
 
-  // 如果没有数据，显示空状态而不是返回null
   if (history.length === 0) {
     return (
-      <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100 flex flex-col items-center justify-center space-y-4 py-16">
-        <div className="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
-          <TrendingUp className="w-8 h-8 text-blue-400" />
+      <div className="flex flex-col items-center justify-center space-y-2 py-8 text-center">
+        <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center">
+          <TrendingUp className="w-6 h-6 text-green-400" />
         </div>
-        <h3 className="text-xl font-bold text-gray-800">暂无历史数据</h3>
-        <p className="text-gray-500 text-center max-w-sm">
-          完成第一次AI分析后，这里将自动展示您的饮食趋势图表和个性化建议。
-        </p>
+        <p className="text-gray-400 text-sm">暂无数据，分析一次后自动生成</p>
       </div>
     )
   }
 
-  // 格式化图表数据
   const chartData = history.map(item => ({
     date: new Date(item.timestamp).toLocaleDateString('zh-CN', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
     '净碳水': item.net_carbs,
@@ -75,141 +76,69 @@ export default function DietHistoryChart() {
   }))
 
   return (
-    <div className="bg-white shadow-xl rounded-2xl p-8 border border-gray-100 space-y-6">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-          <TrendingUp className="w-8 h-8 text-blue-600" />
-          饮食趋势分析
-        </h2>
-        <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-          最近 {history.length} 次记录
-        </span>
-      </div>
-
-      {/* 分析摘要 - 移动端垂直堆叠，大屏水平排列 */}
+    <div className="w-full">
+      {/* Mini Metrics */}
       {analysis && (
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="bg-blue-50 p-4 rounded-xl border border-blue-100 flex items-center justify-between sm:block">
-            <div>
-              <p className="text-sm text-gray-600">平均每餐净碳水</p>
-              <p className="text-xs text-blue-600 mt-1 sm:hidden">
-                {analysis.avgCarbs > 60 ? '⚠️ 偏高' : '✅ 良好'}
-              </p>
-            </div>
-            <div className="text-right sm:text-left">
-              <p className="text-2xl font-bold text-blue-700">{analysis.avgCarbs}g</p>
-              <p className="text-xs text-blue-600 mt-1 hidden sm:block">
-                {analysis.avgCarbs > 60 ? '⚠️ 平均摄入偏高' : '✅ 控制良好'}
-              </p>
-            </div>
-          </div>
-          
-          <div className="bg-orange-50 p-4 rounded-xl border border-orange-100 flex items-center justify-between sm:block">
-            <div>
-              <p className="text-sm text-gray-600">高风险餐次占比</p>
-              <p className="text-xs text-orange-600 mt-1 sm:hidden">
-                {analysis.highRiskCount} 次高风险
-              </p>
-            </div>
-            <div className="text-right sm:text-left">
-              <p className="text-2xl font-bold text-orange-700">
-                {Math.round((analysis.highRiskCount / analysis.count) * 100)}%
-              </p>
-              <p className="text-xs text-orange-600 mt-1 hidden sm:block">
-                {analysis.highRiskCount} 次高风险记录
-              </p>
-            </div>
-          </div>
-
-          <div className="bg-green-50 p-4 rounded-xl border border-green-100 flex items-center justify-between sm:block">
-            <div>
-              <p className="text-sm text-gray-600">最近变化趋势</p>
-              <p className="text-xs text-green-600 mt-1 sm:hidden">
-                较上一餐
-              </p>
-            </div>
-            <div className="text-right sm:text-left">
-              <p className="text-2xl font-bold text-green-700">
-                {analysis.trend > 0 ? `+${analysis.trend}g` : `${analysis.trend}g`}
-              </p>
-              <p className="text-xs text-green-600 mt-1 hidden sm:block">
-                较上一餐波动
-              </p>
-            </div>
-          </div>
+        <div className="flex justify-between gap-2 mb-4 text-xs">
+           <div className="flex-1 bg-green-50 p-2 rounded-lg text-center border border-green-100">
+             <div className="text-green-800/60 mb-1">平均碳水</div>
+             <div className="font-bold text-green-800 text-lg">{analysis.avgCarbs}g</div>
+           </div>
+           <div className="flex-1 bg-red-50 p-2 rounded-lg text-center border border-red-100">
+             <div className="text-red-800/60 mb-1">高风险</div>
+             <div className="font-bold text-red-800 text-lg">{analysis.highRiskCount}次</div>
+           </div>
+           <div className="flex-1 bg-gray-50 p-2 rounded-lg text-center border border-gray-100">
+             <div className="text-gray-500 mb-1">波动</div>
+             <div className={`font-bold text-lg ${analysis.trend > 0 ? 'text-red-500' : 'text-green-500'}`}>
+               {analysis.trend > 0 ? '+' : ''}{analysis.trend}
+             </div>
+           </div>
         </div>
       )}
 
-      {/* 折线图 - 使用固定宽度+滚动容器，避免ResponsiveContainer在某些环境下不渲染的问题 */}
-      <div className="w-full overflow-x-auto bg-gray-50 rounded-xl p-4 border border-gray-100">
-        <div style={{ minWidth: '600px', height: '350px' }}>
-          <LineChart width={600} height={350} data={chartData} margin={{ top: 20, right: 30, left: 0, bottom: 5 }}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e5e7eb" />
+      <div className="h-[200px] w-full text-xs">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={chartData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
             <XAxis 
               dataKey="date" 
-              tick={{ fontSize: 12, fill: '#6b7280' }} 
-              tickMargin={10}
-              stroke="#9ca3af"
+              tick={{ fontSize: 10, fill: '#9CA3AF' }} 
+              tickLine={false}
+              axisLine={false}
+              tickFormatter={(v) => v.split(' ')[1] || v}
             />
-            <YAxis 
-              yAxisId="left" 
-              orientation="left" 
-              stroke="#3B82F6" 
-              label={{ value: '碳水(g)', angle: -90, position: 'insideLeft', fill: '#3B82F6' }}
-              tick={{ fill: '#3B82F6' }}
-            />
-            <YAxis 
-              yAxisId="right" 
-              orientation="right" 
-              stroke="#F59E0B" 
-              label={{ value: '热量(kcal)', angle: 90, position: 'insideRight', fill: '#F59E0B' }}
-              tick={{ fill: '#F59E0B' }}
-            />
+            <YAxis yAxisId="left" tick={{ fontSize: 10, fill: '#9CA3AF' }} tickLine={false} axisLine={false} />
+            <YAxis yAxisId="right" orientation="right" hide />
             <Tooltip 
-              contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)', padding: '12px' }}
-              cursor={{ stroke: '#9ca3af', strokeWidth: 1, strokeDasharray: '4 4' }}
+              contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', fontSize: '12px' }}
             />
-            <Legend verticalAlign="top" height={36} iconType="circle" />
+            <Legend wrapperStyle={{ fontSize: '10px' }} />
             
-            {/* 碳水警戒线 (假设60g为一餐上限) */}
-            <ReferenceLine y={60} yAxisId="left" stroke="#ef4444" strokeDasharray="3 3" label={{ value: '建议上限 (60g)', fill: '#ef4444', fontSize: 12, position: 'insideTopRight' }} />
-            
+            <ReferenceLine yAxisId="left" y={60} label={{ value: '上限', position: 'insideBottomRight', fontSize: 10, fill: '#EF4444' }} stroke="#FECACA" strokeDasharray="3 3" />
+
             <Line 
-              yAxisId="left"
+              yAxisId="left" 
               type="monotone" 
               dataKey="净碳水" 
-              name="净碳水 (g)"
-              stroke="#3B82F6" 
-              strokeWidth={3}
-              dot={{ r: 4, strokeWidth: 2, fill: '#fff' }}
-              activeDot={{ r: 6, strokeWidth: 0 }}
+              name="净碳水(g)"
+              stroke="#769152" 
+              strokeWidth={2}
+              dot={{ r: 3, fill: '#769152', strokeWidth: 0 }}
+              activeDot={{ r: 5 }}
             />
             <Line 
-              yAxisId="right"
+              yAxisId="right" 
               type="monotone" 
               dataKey="热量" 
-              name="热量 (kcal)"
+              name="热量(kcal)"
               stroke="#F59E0B" 
-              strokeWidth={2}
+              strokeWidth={1}
               strokeDasharray="5 5"
-              dot={{ r: 3, fill: '#fff' }}
+              dot={false}
             />
           </LineChart>
-        </div>
-      </div>
-
-      <div className="bg-gray-50 p-4 rounded-xl text-sm text-gray-600 leading-relaxed">
-        <strong className="block text-gray-800 mb-2 flex items-center gap-2">
-          <Calendar className="w-4 h-4" />
-          智能分析建议:
-        </strong>
-        {analysis && analysis.avgCarbs > 60 ? (
-          <p>您最近的平均碳水摄入量偏高（{analysis.avgCarbs}g/餐）。建议适当减少主食份量，增加绿叶蔬菜和优质蛋白的比例。持续的高碳水摄入可能导致血糖波动加大。</p>
-        ) : analysis && analysis.avgCarbs < 30 ? (
-          <p>您最近的碳水摄入量较低（{analysis.avgCarbs}g/餐）。如果是生酮饮食请注意监测酮体；如果不是，请确保摄入足够的复杂碳水以维持能量平衡。</p>
-        ) : (
-          <p>您的饮食控制得当，平均碳水摄入量在建议范围内（{analysis.avgCarbs}g/餐）。请继续保持这种均衡的饮食习惯，并结合适量运动。</p>
-        )}
+        </ResponsiveContainer>
       </div>
     </div>
   )

@@ -5,9 +5,10 @@ import { Upload, X, Camera } from 'lucide-react'
 
 interface ImageUploaderProps {
   onImageSelect: (file: File) => void
+  children?: React.ReactNode
 }
 
-export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
+export default function ImageUploader({ onImageSelect, children }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
 
@@ -65,30 +66,34 @@ export default function ImageUploader({ onImageSelect }: ImageUploaderProps) {
   return (
     <div className="space-y-4">
       {preview ? (
-        <div className="relative rounded-xl overflow-hidden border-2 border-gray-200">
+        <div className="relative rounded-none sm:rounded-xl overflow-hidden bg-gray-100 aspect-square sm:aspect-video w-full group">
           <img
             src={preview}
             alt="预览"
-            className="w-full h-64 object-cover"
+            className="w-full h-full object-cover"
           />
           <button
             onClick={handleRemove}
-            className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-lg hover:bg-gray-100 transition-colors"
+            className="absolute top-4 right-4 p-2 bg-black/50 text-white rounded-full backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity z-10"
           >
-            <X className="w-5 h-5 text-gray-600" />
+            <X className="w-5 h-5" />
           </button>
+          {children}
         </div>
       ) : (
         <div
-          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all aspect-square sm:aspect-[4/3] flex flex-col items-center justify-center ${
             dragOver 
               ? 'border-green-500 bg-green-50' 
-              : 'border-gray-300 hover:border-gray-400'
+              : 'border-gray-300 hover:border-green-400 hover:bg-green-50/30'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
+          <Camera className="w-16 h-16 text-green-600 mb-4 mx-auto" />
+          <p className="text-lg font-medium text-gray-600">点击拍摄或上传食物图片</p>
+          <p className="text-sm text-gray-400 mt-2">支持 JPG, PNG</p>
           <input
             type="file"
             accept="image/*"

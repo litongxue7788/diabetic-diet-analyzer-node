@@ -11,9 +11,10 @@ interface NutritionPieChartProps {
       fat: number
     }
   }>
+  simple?: boolean
 }
 
-export default function NutritionPieChart({ foods }: NutritionPieChartProps) {
+export default function NutritionPieChart({ foods, simple }: NutritionPieChartProps) {
   const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
@@ -44,6 +45,32 @@ export default function NutritionPieChart({ foods }: NutritionPieChartProps) {
   }, [foods])
 
   if (!isMounted || data.length === 0) return null
+
+  if (simple) {
+    return (
+      <div className="flex justify-center items-center w-full h-full">
+        <PieChart width={120} height={120}>
+          <Pie
+            data={data}
+            cx="50%"
+            cy="50%"
+            innerRadius={30}
+            outerRadius={50}
+            paddingAngle={2}
+            dataKey="value"
+          >
+            {data.map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={entry.color} />
+            ))}
+          </Pie>
+          <Tooltip 
+             formatter={(value: number) => [`${value}g`, '']}
+             contentStyle={{ borderRadius: '4px', fontSize: '10px', padding: '4px' }}
+          />
+        </PieChart>
+      </div>
+    )
+  }
 
   return (
     <div className="w-full bg-white rounded-xl p-4 border border-gray-100 flex flex-col items-center">
