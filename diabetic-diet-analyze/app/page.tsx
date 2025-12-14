@@ -102,8 +102,8 @@ export default function Home() {
            {/* Top Section: Settings & Upload */}
            <div className="grid grid-cols-12 gap-3 border-b-2 border-[#6F8D45]/60">
             {/* Left: Model Settings */}
-            <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col items-center justify-center bg-gray-50/50">
-              <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} size={180} />
+            <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden min-h-[220px]">
+              <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} size={140} />
               {provider === 'doubao' && (
                 <input
                   type="text"
@@ -167,14 +167,12 @@ export default function Home() {
               </div>
 
               {/* Right: Line Chart */}
-              <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-48">
+               <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-48">
                  <h4 className="text-sm font-bold text-gray-700 mb-2 text-center">血糖/饮食趋势</h4>
-                 <div className="flex-1 overflow-hidden relative">
-                    <div className="absolute inset-0 left-[-10px] right-[-10px]">
-                      <DietHistoryChart />
-                    </div>
+                 <div className="flex-1 overflow-hidden">
+                   <DietHistoryChart />
                  </div>
-              </div>
+               </div>
            </div>
 
            {/* Bottom: Analysis Advice */}

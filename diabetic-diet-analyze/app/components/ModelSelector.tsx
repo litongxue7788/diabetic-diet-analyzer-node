@@ -25,7 +25,7 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
     'doubao-vision': '豆包',
     'gemini-pro-vision': '双子',
     'qwen-vl-plus': '通义',
-    'deepseek-vl': '深度求索',
+    'deepseek-vl': '深度',
     'yi-vision': '零一',
     'glm-4v': '智谱',
   }
@@ -33,9 +33,17 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
     'doubao-vision': '豆包视觉',
     'gemini-pro-vision': '双子视觉',
     'qwen-vl-plus': '通义视觉',
-    'deepseek-vl': '深度求索(视觉)',
+    'deepseek-vl': '深度视觉',
     'yi-vision': '零一视觉',
     'glm-4v': '智谱视觉',
+  }
+  const descMap: Record<string, string> = {
+    'doubao-vision': '豆包视觉，中文强',
+    'gemini-pro-vision': '双子视觉，速度快',
+    'qwen-vl-plus': '通义视觉，识别准',
+    'deepseek-vl': '深度视觉，通用好',
+    'yi-vision': '零一视觉，表达强',
+    'glm-4v': '智谱视觉，中文佳',
   }
 
   const defaultModels: Model[] = [
@@ -104,7 +112,7 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
              当前选择: {cnFull[selectedModel] || models.find(m => m.id === selectedModel)?.name}
           </p>
           <p className="text-sm text-gray-600 leading-relaxed">
-            {models.find(m => m.id === selectedModel)?.description}
+            {descMap[selectedModel] || models.find(m => m.id === selectedModel)?.description}
           </p>
         </div>
       )}
