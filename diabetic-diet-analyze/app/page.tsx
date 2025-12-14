@@ -11,7 +11,7 @@ import { Camera, FileText, ChevronRight } from 'lucide-react'
 export default function Home() {
   const [activeTab, setActiveTab] = useState<0 | 1>(0)
   const [file, setFile] = useState<File | null>(null)
-  const [selectedModel, setSelectedModel] = useState<string>('gemini-pro-vision')
+  const [selectedModel, setSelectedModel] = useState<string>('doubao-vision')
   const [result, setResult] = useState<any | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -140,6 +140,15 @@ export default function Home() {
                   </summary>
                   <div className="mt-2 space-y-3 pb-2">
                     <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} />
+                    {provider === 'doubao' && (
+                       <input
+                         type="text"
+                         value={doubaoEndpoint}
+                         onChange={(e) => setDoubaoEndpoint(e.target.value)}
+                         placeholder="Doubao Endpoint ID (如: ep-2024...)"
+                         className="w-full p-2 border rounded-lg text-xs"
+                       />
+                    )}
                     <input
                       type="password"
                       value={apiKeys[provider]}
