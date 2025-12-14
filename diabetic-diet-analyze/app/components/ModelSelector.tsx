@@ -62,7 +62,12 @@ export default function ModelSelector({ selectedModel, onModelSelect, size, vari
       const response = await fetch('/api/models')
       const data = await response.json()
       if (data.success) {
-        setModels(data.models)
+        const allow = new Set(['doubao-vision', 'glm-4v', 'qwen-vl-plus'])
+        const transformed = (data.models as Model[]).map(m => ({
+          ...m,
+          status: allow.has(m.id) ? 'available' : 'coming_soon'
+        }))
+        setModels(transformed)
       } else {
          setModels(defaultModels)
       }

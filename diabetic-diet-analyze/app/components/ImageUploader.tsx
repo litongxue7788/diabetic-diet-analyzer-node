@@ -4,28 +4,30 @@ import { useState, useCallback } from 'react'
 import { Upload, X, Camera } from 'lucide-react'
 
 interface ImageUploaderProps {
-  onImageSelect: (file: File) => void
+  onImageSelect: (file: File | null) => void
   children?: React.ReactNode
 }
 
 export default function ImageUploader({ onImageSelect, children }: ImageUploaderProps) {
   const [preview, setPreview] = useState<string | null>(null)
   const [dragOver, setDragOver] = useState(false)
+  const [errorMsg, setErrorMsg] = useState<string | null>(null)
 
   const handleFileSelect = (file: File) => {
     if (!file.type.startsWith('image/')) {
-      alert('请选择图片文件')
+      setErrorMsg('请选择图片文件（支持 JPG/PNG/WEBP）')
       return
     }
 
     if (file.size > 10 * 1024 * 1024) {
-      alert('图片大小不能超过10MB')
+      setErrorMsg('图片大小不能超过 10MB')
       return
     }
 
     const reader = new FileReader()
     reader.onloadend = () => {
       setPreview(reader.result as string)
+      setErrorMsg(null)
     }
     reader.readAsDataURL(file)
 
@@ -60,11 +62,12 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
 
   const handleRemove = () => {
     setPreview(null)
-    // 可以通过onImageSelect传递null来清除，但这里我们假设需要重新选择
+    onImageSelect(null)
+    setErrorMsg(null)
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2">
       {preview ? (
         <div className="relative rounded-2xl overflow-hidden bg-black/5 w-full h-full group flex items-center justify-center border border-[#769152]/20">
           <img
@@ -78,47 +81,45 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
           >
             <X className="w-5 h-5" />
           </button>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleInputChange}
+            id="image-replace"
+            className="hidden"
+          />
+          <label
+            htmlFor="image-replace"
+            className="absolute bottom-4 left-4 px-3 py-1.5 bg-white/85 text-[#769152] rounded-full border border-[#769152]/40 text-xs font-bold cursor-pointer"
+          >
+            更换照片
+          </label>
           {children}
         </div>
       ) : (
         <div
-          className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all w-full h-full flex flex-col items-center justify-center ${
+          className={`relative border-2 border-dashed rounded-2xl p-4 transition-all w-full h-full flex items-center justify-center ${
             dragOver 
-              ? 'border-green-500 bg-green-50' 
-              : 'border-gray-300 hover:border-green-400 hover:bg-green-50/30'
+              ? 'border-[#769152] bg-green-50' 
+              : 'border-[#C8D6BE] hover:border-[#769152] hover:bg-green-50/30'
           }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          <Camera className="w-14 h-14 text-green-600 mb-3 mx-auto" />
-          <p className="text-lg font-medium text-gray-600">点击拍摄或上传食物图片</p>
-          <p className="text-sm text-gray-400 mt-2">支持 JPG, PNG</p>
+          <Camera className="w-14 h-14 text-[#769152] absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
           <input
             type="file"
             accept="image/*"
-            // 添加 capture="environment" 允许移动端直接调用后置摄像头，但为了兼顾从相册选，通常不强制 capture
-            // 在微信小程序 webview 或现代移动浏览器中，不加 capture 默认会弹出 "拍照/相册" 选择菜单
             onChange={handleInputChange}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
             id="image-upload"
           />
-          
-          <div className="space-y-3">
-            <div>
-              <label 
-                htmlFor="image-upload"
-                className="text-xl font-bold text-gray-800"
-              >
-                拍照或上传图片
-              </label>
-              <p className="text-gray-500 mt-1 text-base">点击拍摄餐食，自动分析</p>
-            </div>
-            
-            <p className="text-sm text-gray-400">
-              支持 JPG、PNG、WEBP，最大 10MB
-            </p>
-          </div>
+        </div>
+      )}
+      {errorMsg && (
+        <div className="text-center text-xs text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+          {errorMsg}
         </div>
       )}
     </div>

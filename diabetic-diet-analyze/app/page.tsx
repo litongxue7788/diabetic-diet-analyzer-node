@@ -6,7 +6,7 @@ import ModelSelector from './components/ModelSelector'
 import AnalysisResult from './components/AnalysisResult'
 import DietHistoryChart from './components/DietHistoryChart'
 import NutritionPieChart from './components/NutritionPieChart'
-import { Camera, FileText, ChevronRight } from 'lucide-react'
+import { Camera, FileText, ChevronRight, Settings, User } from 'lucide-react'
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<0 | 1>(0)
@@ -15,6 +15,10 @@ export default function Home() {
   const [result, setResult] = useState<any | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [showSettings, setShowSettings] = useState(false)
+  const [nickname, setNickname] = useState<string>('')
+  const [loggedIn, setLoggedIn] = useState<boolean>(false)
+  const [adminMode, setAdminMode] = useState<boolean>(false)
   
   // API Keys state
   const provider = selectedModel.startsWith('gemini') ? 'google' 
@@ -29,6 +33,7 @@ export default function Home() {
   const [aliBaseUrl, setAliBaseUrl] = useState<string>('https://dashscope.aliyuncs.com/compatible-mode/v1')
   const [deepseekBaseUrl, setDeepseekBaseUrl] = useState<string>('https://api.deepseek.com')
   const [doubaoEndpoint, setDoubaoEndpoint] = useState<string>('')
+  const modelShortLabel: Record<string, string> = { 'doubao-vision': '豆包', 'glm-4v': '智谱', 'qwen-vl-plus': '通义' }
 
   // Handle Analysis
   const handleAnalyze = async () => {
@@ -87,6 +92,44 @@ export default function Home() {
     }
   }, [file])
 
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('dda_settings') || '{}')
+      if (saved.nickname) setNickname(saved.nickname)
+      if (typeof saved.loggedIn === 'boolean') setLoggedIn(saved.loggedIn)
+      const savedKeys = JSON.parse(localStorage.getItem('dda_api_keys') || '{}')
+      if (savedKeys && typeof savedKeys === 'object') setApiKeys(prev => ({ ...prev, ...savedKeys }))
+      const savedDoubao = localStorage.getItem('dda_doubao_endpoint') || ''
+      if (savedDoubao) setDoubaoEndpoint(savedDoubao)
+      const savedAdmin = localStorage.getItem('dda_admin') || ''
+      if (savedAdmin) setAdminMode(savedAdmin === '1')
+    } catch {}
+  }, [])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dda_settings', JSON.stringify({ nickname, loggedIn }))
+    } catch {}
+  }, [nickname, loggedIn])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dda_api_keys', JSON.stringify(apiKeys))
+    } catch {}
+  }, [apiKeys])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dda_doubao_endpoint', doubaoEndpoint || '')
+    } catch {}
+  }, [doubaoEndpoint])
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('dda_admin', adminMode ? '1' : '0')
+    } catch {}
+  }, [adminMode])
+
   return (
     <main className="min-h-screen bg-[#E9F3E2] text-[#2C3E20] pb-24 font-sans">
       <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative rounded-3xl border-4 border-[#6F8D45] overflow-hidden">
@@ -94,36 +137,116 @@ export default function Home() {
         {/* Header */}
         <header className="bg-[#769152] text-white p-4 text-center font-bold text-lg sticky top-0 z-30 shadow-md flex justify-between items-center">
           <span>糖尿病膳食分析</span>
-          <div className="text-xs font-normal opacity-80">v1.2</div>
+          <div className="flex items-center gap-3">
+            {loggedIn ? (
+              <div className="flex items-center gap-1 text-xs bg-white/10 px-2 py-1 rounded-full cursor-pointer hover:bg-white/20" onClick={() => setShowSettings(true)}>
+                <User className="w-4 h-4" />
+                <span>{nickname || '用户'}</span>
+              </div>
+            ) : (
+              <div className="text-xs font-normal opacity-80">v1.2</div>
+            )}
+            <button
+              onClick={() => setShowSettings(v => !v)}
+              className="w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30"
+            >
+              <Settings className="w-5 h-5" />
+            </button>
+          </div>
         </header>
+
+        {showSettings && (
+          <div className="absolute top-14 right-3 z-40 w-[92%] max-w-sm bg-white border border-[#6F8D45]/40 rounded-2xl shadow-xl">
+            <div className="p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="font-bold text-[#2C3E20]">用户设置</div>
+                <button onClick={() => setShowSettings(false)} className="text-xs px-2 py-1 rounded bg-[#769152] text-white">关闭</button>
+              </div>
+              <div className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
+                <div className="text-gray-600">当前模型</div>
+                <div className="font-bold text-[#2C3E20]">{modelShortLabel[selectedModel] || selectedModel}</div>
+              </div>
+              {provider === 'doubao' && (
+                <div className="grid grid-cols-1 gap-2">
+                  <input
+                    type="text"
+                    value={doubaoEndpoint}
+                    onChange={(e) => setDoubaoEndpoint(e.target.value)}
+                    placeholder="Doubao Endpoint ID"
+                    className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-2 gap-2">
+                <input
+                  type="text"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                  placeholder="昵称"
+                  className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                />
+                <button
+                  onClick={() => setLoggedIn(v => !v)}
+                  className="w-full p-2 rounded-lg text-xs font-bold border border-[#769152] text-[#769152] bg-white"
+                >
+                  {loggedIn ? '退出' : '登录'}
+                </button>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-gray-700">管理员模式</span>
+                <button
+                  onClick={() => setAdminMode(v => !v)}
+                  className={`w-12 h-6 rounded-full ${adminMode ? 'bg-[#769152]' : 'bg-gray-300'} relative`}
+                >
+                  <span className={`absolute top-0.5 ${adminMode ? 'right-0.5' : 'left-0.5'} w-5 h-5 bg-white rounded-full`}></span>
+                </button>
+              </div>
+              <div className="border-t border-gray-100 pt-3">
+                <div className="text-xs text-gray-500 mb-2">模型选择</div>
+                <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} variant="horizontal" />
+              </div>
+              {adminMode && (
+                <div className="border-t border-gray-100 pt-3 space-y-2">
+                  <div className="text-xs text-gray-500">高级设置</div>
+                  <input
+                    type="password"
+                    value={apiKeys[provider]}
+                    onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
+                    placeholder={`${provider.toUpperCase()} API Key`}
+                    className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                  />
+                  {provider === 'ali' && (
+                    <input
+                      type="text"
+                      value={aliBaseUrl}
+                      onChange={(e) => setAliBaseUrl(e.target.value)}
+                      placeholder="Ali Base URL"
+                      className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                    />
+                  )}
+                  {provider === 'deepseek' && (
+                    <input
+                      type="text"
+                      value={deepseekBaseUrl}
+                      onChange={(e) => setDeepseekBaseUrl(e.target.value)}
+                      placeholder="Deepseek Base URL"
+                      className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                    />
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Tab 1: Dashboard */}
         <div className={activeTab === 0 ? 'block' : 'hidden'}>
-           {/* Top: Horizontal Model Selector above upload */}
+           {/* Top: Upload only */}
            <div className="p-3 bg-white border-b-2 border-[#6F8D45]/60">
-             <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} variant="horizontal" />
-             <div className="mt-2 grid grid-cols-2 gap-2">
-               {provider === 'doubao' && (
-                 <input
-                   type="text"
-                   value={doubaoEndpoint}
-                   onChange={(e) => setDoubaoEndpoint(e.target.value)}
-                   placeholder="Doubao Endpoint ID"
-                   className="w-full p-2 border rounded-lg text-xs bg-gray-50"
-                 />
-               )}
-               <input
-                 type="password"
-                 value={apiKeys[provider]}
-                 onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
-                 placeholder={`${provider.toUpperCase()} API Key`}
-                 className="w-full p-2 border rounded-lg text-xs bg-gray-50"
-               />
-             </div>
-             <div className="mt-3 relative h-48 sm:h-56 overflow-hidden bg-white rounded-2xl">
+             <div className="mt-3 relative h-40 sm:h-44 overflow-hidden bg-white rounded-2xl">
                <ImageUploader onImageSelect={(f) => { setFile(f); setResult(null); }}>
                   {file && !result && !loading && (
-                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                     <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
                         <button 
                           onClick={(e) => { e.stopPropagation(); handleAnalyze(); }}
                           className="bg-[#769152] text-white px-6 py-2 rounded-full shadow-lg font-bold text-base animate-pulse hover:animate-none flex items-center gap-2 border border-[#6F8D45]"
@@ -140,12 +263,25 @@ export default function Home() {
                   )}
                </ImageUploader>
              </div>
+             <div className="mt-2 flex items-center justify-between">
+               <span className="text-xs text-[#769152] bg-green-50 rounded-full px-2 py-1 border border-[#6F8D45]/30">
+                 当前模型：{modelShortLabel[selectedModel] || selectedModel}
+               </span>
+               <button
+                 onClick={() => file ? handleAnalyze() : setShowSettings(true)}
+                 className={`px-4 py-1.5 rounded-full text-xs font-bold border ${
+                   file ? 'bg-[#769152] text-white border-[#6F8D45]' : 'bg-white text-[#769152] border-[#6F8D45]/40'
+                 }`}
+               >
+                 {file ? '开始分析' : '选择模型'}
+               </button>
+             </div>
            </div>
 
            {/* Middle: 2-Column Charts Grid */}
            <div className="p-4 grid grid-cols-2 gap-4">
               {/* Left: Pie Chart */}
-              <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-48">
+              <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-56">
                  <h4 className="text-sm font-bold text-gray-700 mb-2 text-center">营养分布</h4>
                  <div className="flex-1 relative">
                    {result && result.foods ? (
@@ -161,7 +297,7 @@ export default function Home() {
               </div>
 
               {/* Right: Line Chart */}
-               <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-48">
+               <div className="bg-white p-3 rounded-2xl border-2 border-[#6F8D45]/50 shadow-sm flex flex-col h-56">
                  <h4 className="text-sm font-bold text-gray-700 mb-2 text-center">血糖/饮食趋势</h4>
                  <div className="flex-1 overflow-hidden">
                    <DietHistoryChart />
@@ -226,23 +362,22 @@ export default function Home() {
          </div>
 
         {/* Bottom Navigation: Capsule Buttons (integrated) */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 w-[90%] max-w-[320px] h-14 bg-[#769152]/90 rounded-full border border-[#6F8D45] p-1.5 flex items-center backdrop-blur-sm">
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-30 w-[92%] max-w-[360px] h-16 bg-[#769152]/90 rounded-full border border-[#6F8D45] p-2 flex items-center backdrop-blur-sm">
           <button
             onClick={() => setActiveTab(0)}
-            className={`flex-1 rounded-full px-4 py-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 rounded-full px-5 py-2.5 font-bold text-sm flex items-center justify-center transition-all ${
               activeTab === 0
-                ? 'bg-white text-[#769152] shadow'
+                ? 'bg-white text-[#769152] shadow ring-1 ring-[#6F8D45]/50'
                 : 'text-white hover:bg-white/10'
             }`}
           >
-            <Camera className="w-4 h-4" />
-            <span>拍摄分析</span>
+            <span>分析</span>
           </button>
           <button
             onClick={() => setActiveTab(1)}
-            className={`flex-1 rounded-full px-4 py-2 font-bold text-sm flex items-center justify-center gap-1.5 transition-all ${
+            className={`flex-1 rounded-full px-5 py-2.5 font-bold text-sm flex items-center justify-center gap-1.5 transition-all ${
               activeTab === 1
-                ? 'bg-white text-[#769152] shadow'
+                ? 'bg-white text-[#769152] shadow ring-1 ring-[#6F8D45]/50'
                 : 'text-white hover:bg-white/10'
             }`}
           >
