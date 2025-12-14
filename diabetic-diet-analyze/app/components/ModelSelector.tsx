@@ -21,6 +21,12 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
   const [models, setModels] = useState<Model[]>([])
   const [loading, setLoading] = useState(true)
 
+  const defaultModels: Model[] = [
+    { id: 'doubao-vision', name: 'Doubao Vision', description: '豆包视觉', provider: 'Doubao', status: 'available' },
+    { id: 'gemini-pro-vision', name: 'Gemini Vision', description: 'Google视觉', provider: 'Google', status: 'available' },
+    { id: 'qwen-vl-plus', name: 'Qwen-VL-Plus', description: '通义千问视觉', provider: 'Ali', status: 'available' },
+  ]
+
   useEffect(() => {
     fetchModels()
   }, [])
@@ -31,9 +37,12 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
       const data = await response.json()
       if (data.success) {
         setModels(data.models)
+      } else {
+         setModels(defaultModels)
       }
     } catch (error) {
       console.error('获取模型失败:', error)
+      setModels(defaultModels)
     } finally {
       setLoading(false)
     }
