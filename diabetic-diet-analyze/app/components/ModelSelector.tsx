@@ -60,25 +60,12 @@ export default function ModelSelector({ selectedModel, onModelSelect }: ModelSel
         选择AI模型
       </h3>
 
-      <div className="flex flex-wrap items-center gap-4">
-        {models.map((model) => {
-          const active = selectedModel === model.id
-          const disabled = model.status !== 'available'
-          return (
-            <button
-              key={model.id}
-              onClick={() => onModelSelect(model.id)}
-              disabled={disabled}
-              className={`w-20 h-20 rounded-full border-2 transition-all shadow-md flex items-center justify-center text-center ${
-                active ? 'bg-gradient-to-b from-[#8AA563] to-[#769152] text-white border-[#6F8D45] shadow-lg' : 'bg-white text-gray-700 border-gray-200'
-              } ${disabled ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
-            >
-              <span className="text-[12px] font-bold leading-tight px-2">
-                {model.name}
-              </span>
-            </button>
-          )
-        })}
+      <div className="flex items-center justify-center">
+        <SegmentedCircle
+          models={models}
+          selectedModel={selectedModel}
+          onSelect={onModelSelect}
+        />
       </div>
 
       {selectedModel && (
@@ -92,5 +79,75 @@ export default function ModelSelector({ selectedModel, onModelSelect }: ModelSel
         </div>
       )}
     </div>
+  )
+}
+
+function SegmentedCircle({
+  models,
+  selectedModel,
+  onSelect,
+}: {
+  models: Model[]
+  selectedModel: string
+  onSelect: (id: string) => void
+}) {
+  const size = 220
+  const cx = size / 2
+  const cy = size / 2
+  const rOuter = 100
+  const rInner = 55
+  const colors = ['#769152', '#8AA563', '#6F8D45', '#9BB274', '#5F7E3B', '#A9BC86']
+
+  const toRad = (deg: number) => (deg * Math.PI) / 180
+  const xy = (r: number, angleDeg: number) => {
+    const a = toRad(angleDeg)
+    return { x: cx + r * Math.cos(a), y: cy + r * Math.sin(a) }
+  }
+  const arc = (r: number, startDeg: number, endDeg: number) => {
+    const large = endDeg - startDeg > 180 ? 1 : 0
+    const s = xy(r, startDeg)
+    const e = xy(r, endDeg)
+    return `A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`
+  }
+  const pathFor = (startDeg: number, endDeg: number) => {
+    const sOuter = xy(rOuter, startDeg)
+    const sInner = xy(rInner, endDeg)
+    return `M ${sOuter.x} ${sOuter.y} ${arc(rOuter, startDeg, endDeg)} L ${sInner.x} ${sInner.y} ${arc(rInner, endDeg, startDeg)} Z`
+  }
+
+  const count = models.length || 1
+  const step = 360 / count
+
+  return (
+    <svg width={size} height={size}>
+      {models.map((m, i) => {
+        const start = -90 + i * step
+        const end = start + step
+        const active = selectedModel === m.id
+        const disabled = m.status !== 'available'
+        const fill = active ? `url(#grad-${i})` : colors[i % colors.length]
+        const mid = start + step / 2
+        const tx = cx + Math.cos(toRad(mid)) * 78
+        const ty = cy + Math.sin(toRad(mid)) * 78
+        return (
+          <g key={m.id} onClick={() => !disabled && onSelect(m.id)} style={{ cursor: disabled ? 'not-allowed' : 'pointer' }} opacity={disabled ? 0.4 : 1}>
+            <defs>
+              <linearGradient id={`grad-${i}`} x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stopColor="#A9BC86" />
+                <stop offset="100%" stopColor={colors[i % colors.length]} />
+              </linearGradient>
+            </defs>
+            <path d={pathFor(start, end)} fill={fill} stroke={active ? '#4B5E2D' : '#6F8D45'} strokeWidth={active ? 3 : 2} />
+            <text x={tx} y={ty} fill={active ? '#ffffff' : '#1F2937'} fontSize="11" fontWeight="700" textAnchor="middle" dominantBaseline="middle">
+              {m.name}
+            </text>
+          </g>
+        )
+      })}
+      <circle cx={cx} cy={cy} r={rInner - 6} fill="#ffffff" stroke="#6F8D45" strokeWidth="2" />
+      <text x={cx} y={cy} fill="#374151" fontSize="12" fontWeight="700" textAnchor="middle" dominantBaseline="middle">
+        {models.find(m => m.id === selectedModel)?.name || '选择模型'}
+      </text>
+    </svg>
   )
 }

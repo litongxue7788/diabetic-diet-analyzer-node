@@ -82,7 +82,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
         </div>
       ) : (
         <div
-          className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-all aspect-square sm:aspect-[4/3] flex flex-col items-center justify-center ${
+          className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all aspect-[4/3] flex flex-col items-center justify-center ${
             dragOver 
               ? 'border-green-500 bg-green-50' 
               : 'border-gray-300 hover:border-green-400 hover:bg-green-50/30'
@@ -91,7 +91,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          <Camera className="w-16 h-16 text-green-600 mb-4 mx-auto" />
+          <Camera className="w-14 h-14 text-green-600 mb-3 mx-auto" />
           <p className="text-lg font-medium text-gray-600">点击拍摄或上传食物图片</p>
           <p className="text-sm text-gray-400 mt-2">支持 JPG, PNG</p>
           <input
@@ -104,13 +104,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
             id="image-upload"
           />
           
-          <div className="space-y-4">
-            <div className="flex justify-center gap-4">
-               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-green-50 text-green-600 border-2 border-green-100">
-                 <Camera className="w-10 h-10" />
-               </div>
-            </div>
-            
+          <div className="space-y-3">
             <div>
               <label 
                 htmlFor="image-upload"
@@ -118,7 +112,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
               >
                 拍照或上传图片
               </label>
-              <p className="text-gray-500 mt-2 text-base">点击拍摄餐食，自动分析营养</p>
+              <p className="text-gray-500 mt-1 text-base">点击拍摄餐食，自动分析</p>
             </div>
             
             <p className="text-sm text-gray-400">
