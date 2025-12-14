@@ -110,7 +110,7 @@ export default function Home() {
                  )}
                  {/* Overlay Analyze Button if file selected but no result */}
                  {file && !result && !loading && (
-                    <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                    <div className="absolute left-0 right-0 flex justify-center z-20 bottom-24 sm:bottom-6">
                        <button 
                          onClick={(e) => { e.stopPropagation(); handleAnalyze(); }}
                          className="bg-[#769152] text-white px-8 py-3 rounded-full shadow-lg font-bold text-lg animate-pulse hover:animate-none"
@@ -130,12 +130,12 @@ export default function Home() {
               </ImageUploader>
            </div>
 
-           {/* Settings / Config (Collapsed by default or small) */}
-           {!result && !loading && (
-             <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
+          {/* Settings / Config (Collapsed by default or small) */}
+          {!result && !loading && (
+            <div className="px-4 py-2 bg-gray-50 border-b border-gray-100">
                 <details className="text-sm text-gray-500">
                   <summary className="cursor-pointer list-none flex items-center gap-2">
-                    <span>⚙️ 模型设置 (默认 Gemini)</span>
+                    <span>⚙️ 模型设置 (默认 Doubao Vision)</span>
                     <ChevronRight className="w-4 h-4" />
                   </summary>
                   <div className="mt-2 space-y-3 pb-2">

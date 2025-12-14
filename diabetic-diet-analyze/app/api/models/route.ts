@@ -64,6 +64,6 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     models,
-    defaultModel: 'gemini-pro-vision',
+    defaultModel: 'doubao-vision',
   })
 }

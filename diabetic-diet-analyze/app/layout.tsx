@@ -15,7 +15,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#ffffff',
+  themeColor: '#769152',
 }
 
 export default function RootLayout({
@@ -26,21 +26,7 @@ export default function RootLayout({
   return (
     <html lang="zh-CN">
       <body className={inter.className}>
-        <div className="min-h-screen bg-gray-50">
-          <header className="bg-white shadow">
-            <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-              <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-                糖尿病膳食分析助手
-              </h1>
-              <p className="mt-2 text-gray-600">
-                阳光饮食，轻简生活
-              </p>
-            </div>
-          </header>
-          <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
-            {children}
-          </main>
-        </div>
+        {children}
       </body>
     </html>
   )
