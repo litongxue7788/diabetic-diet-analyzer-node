@@ -97,6 +97,7 @@ function SegmentedCircle({
   models,
   selectedModel,
   onSelect,
+  size,
 }: {
   models: Model[]
   selectedModel: string
@@ -131,7 +132,7 @@ function SegmentedCircle({
   const step = 360 / count
 
   return (
-    <svg width={size} height={size}>
+    <svg width={s} height={s}>
       {models.map((m, i) => {
         const start = -90 + i * step
         const end = start + step
