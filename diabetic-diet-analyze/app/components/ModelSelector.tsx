@@ -15,9 +15,10 @@ interface ModelSelectorProps {
   selectedModel: string
   onModelSelect: (modelId: string) => void
   size?: number
+  variant?: 'circle' | 'horizontal'
 }
 
-export default function ModelSelector({ selectedModel, onModelSelect, size }: ModelSelectorProps) {
+export default function ModelSelector({ selectedModel, onModelSelect, size, variant = 'horizontal' }: ModelSelectorProps) {
   const [models, setModels] = useState<Model[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -76,12 +77,12 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
   if (loading) {
     return (
       <div className="space-y-4">
-        <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+        <h3 className="text-base font-bold text-gray-800 flex items-center gap-2">
           <Brain className="w-6 h-6 text-green-600" />
           选择AI模型
         </h3>
         <div className="animate-pulse space-y-2">
-          <div className="h-14 bg-gray-200 rounded-xl"></div>
+          <div className="h-10 bg-gray-200 rounded-full"></div>
           <div className="h-5 bg-gray-200 rounded w-2/3"></div>
         </div>
       </div>
@@ -89,22 +90,31 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
   }
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-xl font-bold text-gray-800 flex items-center gap-2">
+    <div className="space-y-2">
+      <h3 className="text-sm font-bold text-gray-800 flex items-center gap-2">
         <Brain className="w-6 h-6 text-green-600" />
         选择AI模型
       </h3>
 
-      <div className="flex items-center justify-center">
-        <SegmentedCircle
+      {variant === 'circle' ? (
+        <div className="flex items-center justify-center">
+          <SegmentedCircle
+            models={models}
+            selectedModel={selectedModel}
+            onSelect={onModelSelect}
+            size={size}
+            labelMap={cnShort}
+            centerLabelMap={cnFull}
+          />
+        </div>
+      ) : (
+        <HorizontalSegments
           models={models}
           selectedModel={selectedModel}
           onSelect={onModelSelect}
-          size={size}
           labelMap={cnShort}
-          centerLabelMap={cnFull}
         />
-      </div>
+      )}
 
       {selectedModel && (
         <div className="p-5 bg-green-50 rounded-xl border border-green-100">
@@ -116,6 +126,39 @@ export default function ModelSelector({ selectedModel, onModelSelect, size }: Mo
           </p>
         </div>
       )}
+    </div>
+  )
+}
+
+function HorizontalSegments({
+  models,
+  selectedModel,
+  onSelect,
+  labelMap,
+}: {
+  models: Model[]
+  selectedModel: string
+  onSelect: (id: string) => void
+  labelMap?: Record<string, string>
+}) {
+  return (
+    <div className="w-full flex items-center gap-2 bg-white rounded-full border border-[#6F8D45]/60 p-1.5 overflow-x-auto">
+      {models.map((m) => {
+        const active = selectedModel === m.id
+        const disabled = m.status !== 'available'
+        return (
+          <button
+            key={m.id}
+            onClick={() => !disabled && onSelect(m.id)}
+            className={`px-3 py-1.5 rounded-full text-sm font-bold transition-all whitespace-nowrap ${
+              active ? 'bg-[#769152] text-white shadow' : 'bg-white text-[#769152] border border-[#6F8D45]/40'
+            } ${disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'}`}
+            aria-pressed={active}
+          >
+            {(labelMap && labelMap[m.id]) || m.name}
+          </button>
+        )
+      })}
     </div>
   )
 }

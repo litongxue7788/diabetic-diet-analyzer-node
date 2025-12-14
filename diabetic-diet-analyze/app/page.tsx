@@ -99,52 +99,46 @@ export default function Home() {
 
         {/* Tab 1: Dashboard */}
         <div className={activeTab === 0 ? 'block' : 'hidden'}>
-           {/* Top Section: Settings & Upload */}
-           <div className="grid grid-cols-12 gap-3 border-b-2 border-[#6F8D45]/60">
-            {/* Left: Model Settings */}
-            <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col items-center justify-center bg-gray-50/50 relative overflow-hidden min-h-[220px]">
-              <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} size={140} />
-              {provider === 'doubao' && (
-                <input
-                  type="text"
-                  value={doubaoEndpoint}
-                  onChange={(e) => setDoubaoEndpoint(e.target.value)}
-                  placeholder="Doubao Endpoint ID"
-                  className="w-full mt-3 p-2 border rounded-lg text-xs bg-gray-50"
-                />
-              )}
-              <input
-                type="password"
-                value={apiKeys[provider]}
-                onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
-                placeholder={`${provider.toUpperCase()} API Key`}
-                className="w-full mt-2 p-2 border rounded-lg text-xs bg-gray-50"
-              />
-            </div>
-
-             {/* Right: Upload Area */}
-             <div className="col-span-8 p-2">
-                <div className="relative h-48 sm:h-56 overflow-hidden bg-white rounded-2xl">
-                  <ImageUploader onImageSelect={(f) => { setFile(f); setResult(null); }}>
-                     {/* Analyze Button inside Upload Area */}
-                     {file && !result && !loading && (
-                        <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
-                           <button 
-                             onClick={(e) => { e.stopPropagation(); handleAnalyze(); }}
-                             className="bg-[#769152] text-white px-6 py-2 rounded-full shadow-lg font-bold text-base animate-pulse hover:animate-none flex items-center gap-2 border border-[#6F8D45]"
-                           >
-                             <span>✨ 点击分析</span>
-                           </button>
-                        </div>
-                     )}
-                     {loading && (
-                        <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-[#769152]"></div>
-                          <span className="mt-2 text-xs font-bold text-[#769152]">正在分析...</span>
-                        </div>
-                     )}
-                  </ImageUploader>
-                </div>
+           {/* Top: Horizontal Model Selector above upload */}
+           <div className="p-3 bg-white border-b-2 border-[#6F8D45]/60">
+             <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} variant="horizontal" />
+             <div className="mt-2 grid grid-cols-2 gap-2">
+               {provider === 'doubao' && (
+                 <input
+                   type="text"
+                   value={doubaoEndpoint}
+                   onChange={(e) => setDoubaoEndpoint(e.target.value)}
+                   placeholder="Doubao Endpoint ID"
+                   className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+                 />
+               )}
+               <input
+                 type="password"
+                 value={apiKeys[provider]}
+                 onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
+                 placeholder={`${provider.toUpperCase()} API Key`}
+                 className="w-full p-2 border rounded-lg text-xs bg-gray-50"
+               />
+             </div>
+             <div className="mt-3 relative h-48 sm:h-56 overflow-hidden bg-white rounded-2xl">
+               <ImageUploader onImageSelect={(f) => { setFile(f); setResult(null); }}>
+                  {file && !result && !loading && (
+                     <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
+                        <button 
+                          onClick={(e) => { e.stopPropagation(); handleAnalyze(); }}
+                          className="bg-[#769152] text-white px-6 py-2 rounded-full shadow-lg font-bold text-base animate-pulse hover:animate-none flex items-center gap-2 border border-[#6F8D45]"
+                        >
+                          <span>✨ 点击分析</span>
+                        </button>
+                     </div>
+                  )}
+                  {loading && (
+                     <div className="absolute inset-0 bg-white/80 z-20 flex flex-col items-center justify-center">
+                       <div className="animate-spin rounded-full h-8 w-8 border-4 border-gray-200 border-t-[#769152]"></div>
+                       <span className="mt-2 text-xs font-bold text-[#769152]">正在分析...</span>
+                     </div>
+                  )}
+               </ImageUploader>
              </div>
            </div>
 
