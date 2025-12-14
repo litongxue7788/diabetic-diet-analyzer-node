@@ -140,6 +140,24 @@ export default function DietHistoryChart() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+      {chartData.length > 0 && (
+        <div className="mt-2 flex justify-center gap-6 text-xs">
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-[#769152]"></span>
+            <span className="text-gray-600">净碳水</span>
+            <span className="font-bold text-gray-900">
+              {chartData[chartData.length - 1]['净碳水']}g
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="w-3 h-3 rounded-full bg-[#F59E0B]"></span>
+            <span className="text-gray-600">热量</span>
+            <span className="font-bold text-gray-900">
+              {chartData[chartData.length - 1]['热量']}kcal
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

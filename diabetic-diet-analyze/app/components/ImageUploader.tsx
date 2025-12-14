@@ -66,7 +66,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
   return (
     <div className="space-y-4">
       {preview ? (
-        <div className="relative rounded-none sm:rounded-xl overflow-hidden bg-black/5 aspect-square sm:aspect-video w-full group flex items-center justify-center">
+        <div className="relative rounded-2xl overflow-hidden bg-black/5 aspect-square sm:aspect-video w-full group flex items-center justify-center border border-[#769152]/20">
           <img
             src={preview}
             alt="预览"

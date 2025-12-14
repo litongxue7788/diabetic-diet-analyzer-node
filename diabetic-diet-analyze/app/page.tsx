@@ -88,8 +88,8 @@ export default function Home() {
   }, [file])
 
   return (
-    <main className="min-h-screen bg-[#FAFCF8] text-[#2C3E20] pb-24 font-sans">
-      <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative">
+    <main className="min-h-screen bg-[#769152] text-[#2C3E20] pb-24 font-sans">
+      <div className="max-w-md mx-auto min-h-screen bg-white shadow-2xl relative rounded-3xl border-4 border-[#6F8D45] overflow-hidden">
         
         {/* Header */}
         <header className="bg-[#769152] text-white p-4 text-center font-bold text-lg sticky top-0 z-30 shadow-md flex justify-between items-center">
@@ -100,9 +100,9 @@ export default function Home() {
         {/* Tab 1: Dashboard */}
         <div className={activeTab === 0 ? 'block' : 'hidden'}>
            {/* Top Section: Settings & Upload */}
-           <div className="grid grid-cols-12 gap-1 bg-white border-b border-gray-100">
+           <div className="grid grid-cols-12 gap-1 bg-white border-b border-gray-200">
              {/* Left: Model Settings */}
-             <div className="col-span-4 p-2 border-r border-gray-100 flex flex-col justify-center items-center text-center bg-gray-50/50">
+             <div className="col-span-4 p-2 border-r border-gray-200 flex flex-col justify-center items-center text-center bg-gray-50/50">
                <div className="w-full h-full flex flex-col items-center justify-center space-y-2">
                  <details className="w-full">
                    <summary className="list-none flex flex-col items-center cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
@@ -118,7 +118,7 @@ export default function Home() {
                      const target = e.target as HTMLElement;
                      if (target.tagName === 'DIV') target.closest('details')?.removeAttribute('open');
                    }}>
-                     <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
+                     <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-gray-200 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
                        <div className="flex justify-between items-center mb-4">
                          <h3 className="text-lg font-bold">模型配置</h3>
                          <button onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')} className="p-2 bg-gray-100 rounded-full">✕</button>
@@ -142,7 +142,7 @@ export default function Home() {
                        />
                        <button 
                          onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
-                         className="w-full mt-4 bg-[#769152] text-white py-3 rounded-xl font-bold"
+                         className="w-full mt-4 bg-[#769152] text-white py-3 rounded-xl font-bold border border-[#6F8D45]"
                        >
                          保存设置
                        </button>
@@ -161,7 +161,7 @@ export default function Home() {
                         <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/10 backdrop-blur-[2px]">
                            <button 
                              onClick={(e) => { e.stopPropagation(); handleAnalyze(); }}
-                             className="bg-[#769152] text-white px-6 py-2 rounded-full shadow-lg font-bold text-base animate-pulse hover:animate-none flex items-center gap-2"
+                             className="bg-[#769152] text-white px-6 py-2 rounded-full shadow-lg font-bold text-base animate-pulse hover:animate-none flex items-center gap-2 border border-[#6F8D45]"
                            >
                              <span>✨ 点击分析</span>
                            </button>
@@ -181,7 +181,7 @@ export default function Home() {
            {/* Middle: 2-Column Charts Grid */}
            <div className="p-4 grid grid-cols-2 gap-4">
               {/* Left: Pie Chart */}
-              <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-48">
+              <div className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-48">
                  <h4 className="text-sm font-bold text-gray-700 mb-2 text-center">营养分布</h4>
                  <div className="flex-1 relative">
                    {result && result.foods ? (
@@ -197,7 +197,7 @@ export default function Home() {
               </div>
 
               {/* Right: Line Chart */}
-              <div className="bg-white p-3 rounded-2xl border border-gray-100 shadow-sm flex flex-col h-48">
+              <div className="bg-white p-3 rounded-2xl border border-gray-200 shadow-sm flex flex-col h-48">
                  <h4 className="text-sm font-bold text-gray-700 mb-2 text-center">血糖/饮食趋势</h4>
                  <div className="flex-1 overflow-hidden relative">
                     <div className="absolute inset-0 left-[-10px] right-[-10px]">
@@ -209,7 +209,7 @@ export default function Home() {
 
            {/* Bottom: Analysis Advice */}
            <div className="px-4 pb-20">
-              <div className="bg-white rounded-2xl p-4 shadow-sm border border-green-50">
+              <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-200">
                  <h3 className="text-[#769152] font-bold text-lg mb-3 flex items-center gap-2">
                    <span className="w-1 h-5 bg-[#769152] rounded-full"></span>
                    分析建议
@@ -225,23 +225,23 @@ export default function Home() {
                               {result.risk_level}风险
                            </span>
                            <span className="text-xs text-gray-400">基于本次餐食</span>
-                       </div>
-                       {result.recommendations?.slice(0, 3).map((rec: string, i: number) => (
-                          <div key={i} className="flex gap-2 text-sm text-gray-600 leading-relaxed">
-                             <span className="text-[#769152] mt-0.5">•</span>
-                             <span>{rec}</span>
-                          </div>
-                       ))}
-                    </div>
-                 ) : (
-                    <div className="text-center text-gray-400 py-4 text-sm">
-                       <p>暂无分析数据</p>
-                       <p className="text-xs mt-1 opacity-60">请先上传照片并分析</p>
-                    </div>
-                 )}
-              </div>
-           </div>
-        </div>
+                        </div>
+                        {result.recommendations?.slice(0, 3).map((rec: string, i: number) => (
+                           <div key={i} className="flex gap-2 text-sm text-gray-600 leading-relaxed">
+                              <span className="text-[#769152] mt-0.5">•</span>
+                              <span>{rec}</span>
+                           </div>
+                        ))}
+                     </div>
+                  ) : (
+                     <div className="text-center text-gray-400 py-4 text-sm">
+                        <p>暂无分析数据</p>
+                        <p className="text-xs mt-1 opacity-60">请先上传照片并分析</p>
+                     </div>
+                  )}
+               </div>
+            </div>
+         </div>
 
         {/* Tab 2: Details Report */}
         <div className={activeTab === 1 ? 'block' : 'hidden'}>
@@ -258,16 +258,16 @@ export default function Home() {
                     >
                       去拍摄
                     </button>
-                 </div>
-              )}
-           </div>
-        </div>
+                  </div>
+               )}
+            </div>
+         </div>
 
         {/* Bottom Navigation: Slider Style */}
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-64 h-12 bg-white/90 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100 p-1 flex items-center relative">
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-64 h-12 bg-[#769152]/20 backdrop-blur-md rounded-full shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-[#769152]/40 p-1 flex items-center relative">
            {/* Slider Background */}
            <div 
-             className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-[#769152] rounded-full transition-all duration-300 ease-out shadow-sm ${
+             className={`absolute top-1 bottom-1 w-[calc(50%-4px)] bg-[#769152] rounded-full transition-all duration-300 ease-out shadow-lg border border-[#6F8D45] ${
                activeTab === 0 ? 'left-1' : 'left-[calc(50%+2px)]'
              }`}
            ></div>
@@ -293,9 +293,9 @@ export default function Home() {
              <FileText className="w-4 h-4" />
              <span>详细报告</span>
            </button>
-        </div>
+         </div>
 
-      </div>
-    </main>
-  )
-}
+       </div>
+     </main>
+   )
+  }
