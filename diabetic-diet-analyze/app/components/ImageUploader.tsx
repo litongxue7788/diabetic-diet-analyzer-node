@@ -82,7 +82,7 @@ export default function ImageUploader({ onImageSelect, children }: ImageUploader
         </div>
       ) : (
         <div
-          className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all aspect-[4/3] flex flex-col items-center justify-center ${
+          className={`relative border-2 border-dashed rounded-2xl p-4 text-center transition-all w-full h-full flex flex-col items-center justify-center ${
             dragOver 
               ? 'border-green-500 bg-green-50' 
               : 'border-gray-300 hover:border-green-400 hover:bg-green-50/30'

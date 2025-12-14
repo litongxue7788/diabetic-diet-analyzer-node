@@ -101,60 +101,30 @@ export default function Home() {
         <div className={activeTab === 0 ? 'block' : 'hidden'}>
            {/* Top Section: Settings & Upload */}
            <div className="grid grid-cols-12 gap-1 bg-white border-b-2 border-[#6F8D45]/60">
-             {/* Left: Model Settings */}
-             <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col justify-center items-center text-center bg-gray-50/50">
-               <div className="w-full h-full flex flex-col items-center justify-center space-y-2">
-                 <details className="w-full">
-                   <summary className="list-none flex flex-col items-center cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition-colors">
-                     <div className="w-10 h-10 rounded-full bg-[#769152]/10 flex items-center justify-center text-[#769152] mb-1">
-                       <span className="text-xl">⚙️</span>
-                     </div>
-                     <span className="text-xs font-bold text-gray-700">大模型设置</span>
-                     <span className="text-[10px] text-gray-400 mt-0.5 scale-90">{selectedModel.split('-')[0]}</span>
-                   </summary>
-                   
-                   {/* Popup Settings */}
-                   <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={(e) => {
-                     const target = e.target as HTMLElement;
-                     if (target.tagName === 'DIV') target.closest('details')?.removeAttribute('open');
-                   }}>
-                     <div className="bg-white rounded-2xl p-6 w-full max-w-sm shadow-2xl border border-gray-200 animate-in zoom-in-95 duration-200" onClick={e => e.stopPropagation()}>
-                       <div className="flex justify-between items-center mb-4">
-                         <h3 className="text-lg font-bold">模型配置</h3>
-                         <button onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')} className="p-2 bg-gray-100 rounded-full">✕</button>
-                       </div>
-                       <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} />
-                       {provider === 'doubao' && (
-                          <input
-                            type="text"
-                            value={doubaoEndpoint}
-                            onChange={(e) => setDoubaoEndpoint(e.target.value)}
-                            placeholder="Doubao Endpoint ID"
-                            className="w-full mt-3 p-3 border rounded-xl text-sm bg-gray-50"
-                          />
-                       )}
-                       <input
-                         type="password"
-                         value={apiKeys[provider]}
-                         onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
-                         placeholder={`${provider.toUpperCase()} API Key`}
-                         className="w-full mt-3 p-3 border rounded-xl text-sm bg-gray-50"
-                       />
-                       <button 
-                         onClick={(e) => e.currentTarget.closest('details')?.removeAttribute('open')}
-                         className="w-full mt-4 bg-[#769152] text-white py-3 rounded-xl font-bold border border-[#6F8D45]"
-                       >
-                         保存设置
-                       </button>
-                     </div>
-                   </div>
-                 </details>
-               </div>
-             </div>
+            {/* Left: Model Settings */}
+            <div className="col-span-4 p-2 border-r-2 border-[#6F8D45]/60 flex flex-col items-center justify-center bg-gray-50/50">
+              <ModelSelector selectedModel={selectedModel} onModelSelect={setSelectedModel} size={180} />
+              {provider === 'doubao' && (
+                <input
+                  type="text"
+                  value={doubaoEndpoint}
+                  onChange={(e) => setDoubaoEndpoint(e.target.value)}
+                  placeholder="Doubao Endpoint ID"
+                  className="w-full mt-3 p-2 border rounded-lg text-xs bg-gray-50"
+                />
+              )}
+              <input
+                type="password"
+                value={apiKeys[provider]}
+                onChange={(e) => setApiKeys({ ...apiKeys, [provider]: e.target.value })}
+                placeholder={`${provider.toUpperCase()} API Key`}
+                className="w-full mt-2 p-2 border rounded-lg text-xs bg-gray-50"
+              />
+            </div>
 
              {/* Right: Upload Area */}
              <div className="col-span-8 p-2">
-                <div className="h-40 sm:h-48 relative">
+                <div className="relative h-48 sm:h-56 overflow-hidden">
                   <ImageUploader onImageSelect={(f) => { setFile(f); setResult(null); }}>
                      {/* Analyze Button inside Upload Area */}
                      {file && !result && !loading && (

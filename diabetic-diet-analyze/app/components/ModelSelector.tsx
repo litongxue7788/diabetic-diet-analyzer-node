@@ -14,9 +14,10 @@ interface Model {
 interface ModelSelectorProps {
   selectedModel: string
   onModelSelect: (modelId: string) => void
+  size?: number
 }
 
-export default function ModelSelector({ selectedModel, onModelSelect }: ModelSelectorProps) {
+export default function ModelSelector({ selectedModel, onModelSelect, size }: ModelSelectorProps) {
   const [models, setModels] = useState<Model[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -65,6 +66,7 @@ export default function ModelSelector({ selectedModel, onModelSelect }: ModelSel
           models={models}
           selectedModel={selectedModel}
           onSelect={onModelSelect}
+          size={size}
         />
       </div>
 
@@ -90,12 +92,13 @@ function SegmentedCircle({
   models: Model[]
   selectedModel: string
   onSelect: (id: string) => void
+  size?: number
 }) {
-  const size = 220
-  const cx = size / 2
-  const cy = size / 2
-  const rOuter = 100
-  const rInner = 55
+  const s = size || 220
+  const cx = s / 2
+  const cy = s / 2
+  const rOuter = Math.round(s * 0.45)
+  const rInner = Math.round(s * 0.25)
   const colors = ['#769152', '#8AA563', '#6F8D45', '#9BB274', '#5F7E3B', '#A9BC86']
 
   const toRad = (deg: number) => (deg * Math.PI) / 180
