@@ -303,6 +303,17 @@ export async function POST(request: NextRequest) {
       if (!doubaoRes.ok) {
          const err = await doubaoRes.text();
          console.error('[Analyze] Doubao Error:', err);
+         
+         if (doubaoRes.status === 401 && err.includes('API key format is incorrect')) {
+           return NextResponse.json(
+             {
+               success: false,
+               error: '豆包 API Key 格式不正确。请在环境变量 DOUBAO_API_KEY 中填写 Ark 控制台生成的 API Key（不要包含 Bearer 前缀）。'
+             },
+             { status: 400 }
+           );
+         }
+         
          throw new Error(`Doubao API Error: ${err}`);
       }
       const dbJson = await doubaoRes.json();
